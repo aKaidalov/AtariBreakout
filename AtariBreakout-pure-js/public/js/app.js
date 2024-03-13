@@ -1,29 +1,65 @@
 import Brain from "./brain.js";
 import UI from "./ui.js";
 
+// recursively update UI
+function uiDrawRepeater(ui) {
+    setTimeout(() => {
+        ui.draw();
+        uiDrawRepeater(ui);
+    }, 0);
+}
+
 function main() {
     let appDiv = document.querySelector("#app");
     let brain = new Brain();
     let ui = new UI(brain, appDiv);
 
-    ui.draw();
+    /*ui.draw();
 
-    window.addEventListener('resize', (e) => {
+    const fn = (e) => {
         ui.draw();
-    });
+    }
+
+    window.addEventListener('resize', fn);*/
 
     document.addEventListener('keydown', (e) => {
         console.log(e);
         switch (e.key) {
             case 'ArrowLeft':
-                brain.movePaddle(-1);
+                brain.startMovePaddle(-1);
                 break;
             case 'ArrowRight':
-                brain.movePaddle(1);
+                brain.startMovePaddle(1);
                 break;
         }
-        ui.draw();
     });
+    document.addEventListener('keyup', (e) => {
+        console.log(e);
+        switch (e.key) {
+            case 'ArrowLeft':
+                brain.stopMovePaddle();
+                break;
+            case 'ArrowRight':
+                brain.stopMovePaddle();
+                break;
+        }
+    });
+
+    // document.addEventListener('keydown', (e) => {
+    //     console.log(e);
+    //     switch (e.key) {
+    //         case 'ArrowLeft':
+    //             brain.movePaddle(-1);
+    //             break;
+    //         case 'ArrowRight':
+    //             brain.movePaddle(1);
+    //             break;
+    //     }
+    //     ui.draw();
+    // });
+
+    // draw ui as fast as possible - on repeat
+    uiDrawRepeater(ui);
 }
 
 // ============== ENTRY POINT ==============

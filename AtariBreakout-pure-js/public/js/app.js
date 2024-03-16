@@ -14,14 +14,6 @@ function main() {
     let brain = new Brain();
     let ui = new UI(brain, appDiv);
 
-    /*ui.draw();
-
-    const fn = (e) => {
-        ui.draw();
-    }
-
-    window.addEventListener('resize', fn);*/
-
     document.addEventListener('keydown', (e) => {
         console.log(e);
         switch (e.key) {
@@ -45,20 +37,23 @@ function main() {
         }
     });
 
-    // document.addEventListener('keydown', (e) => {
-    //     console.log(e);
-    //     switch (e.key) {
-    //         case 'ArrowLeft':
-    //             brain.movePaddle(-1);
-    //             break;
-    //         case 'ArrowRight':
-    //             brain.movePaddle(1);
-    //             break;
-    //     }
-    //     ui.draw();
-    // });
 
-    // draw ui as fast as possible - on repeat
+    document.addEventListener('keydown', (e) => {
+        console.log(e);
+        if (e.code === "Space") {
+            if (!brain.gamePaused) {
+                brain.gamePaused = true;
+                brain.stopMoveBall();
+            }
+            else if (brain.gamePaused) {
+                brain.gamePaused = false;
+                brain.startMoveBall();
+            }
+        }
+    });
+
+
+
     uiDrawRepeater(ui);
 }
 

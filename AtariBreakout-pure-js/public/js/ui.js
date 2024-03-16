@@ -58,19 +58,76 @@ export default class UI {
     }
 
     drawPaddle(paddle) {
-        let div = document.createElement('div');
+        let divPaddle = document.createElement('div');
 
-        div.style.zIndex = 10;
-        div.style.position = 'fixed';
+        divPaddle.style.zIndex = 10;
+        divPaddle.style.position = 'fixed';
 
-        div.style.left = this.calculatedScaledX(paddle.left) + 'px';
-        div.style.top = this.calculatedScaledY(paddle.top) + 'px';
+        divPaddle.style.left = this.calculatedScaledX(paddle.left) + 'px';
+        divPaddle.style.top = this.calculatedScaledY(paddle.top) + 'px';
 
-        div.style.width = this.calculatedScaledX(paddle.width) + 'px';
-        div.style.height = this.calculatedScaledY(paddle.height) + 'px';
-        div.style.backgroundColor = paddle.color;
+        divPaddle.style.width = this.calculatedScaledX(paddle.width) + 'px';
+        divPaddle.style.height = this.calculatedScaledY(paddle.height) + 'px';
+        divPaddle.style.backgroundColor = paddle.color;
 
-        this.appContainer.append(div);
+        this.appContainer.append(divPaddle);
+    }
+
+    drawBall(ball) {
+        let divBall = document.createElement('div');
+
+        divBall.style.zIndex = 10;
+        divBall.style.position = 'fixed';
+
+        divBall.style.borderRadius = "50%";
+
+        divBall.style.left = this.calculatedScaledX(ball.left) + 'px';
+        divBall.style.top = this.calculatedScaledY(ball.top) + 'px';
+
+        divBall.style.width = this.calculatedScaledX(ball.width) + 'px';
+        divBall.style.height = this.calculatedScaledY(ball.height) + 'px';
+        divBall.style.backgroundColor = ball.color;
+
+        this.appContainer.append(divBall);
+    }
+
+    drawBlocks(blocks) {
+        blocks.blockArr.forEach(block => {
+            if (!block.break) { // Draw only if the block wasn't break
+                let divBlock = document.createElement('div');
+
+                divBlock.style.zIndex = 10;
+                divBlock.style.position = 'fixed';
+
+                divBlock.style.left = this.calculatedScaledX(block.left) + 'px';
+                divBlock.style.bottom = this.calculatedScaledY(block.height - block.top - block.height) + 'px'; // Positioning blocks from the bottom
+
+                divBlock.style.width = this.calculatedScaledX(block.width) + 'px';
+                divBlock.style.height = this.calculatedScaledY(block.height) + 'px';
+                divBlock.style.backgroundColor = block.color;
+
+                this.appContainer.appendChild(divBlock);
+            }
+        });
+    }
+
+    drawPause() {
+        let divPause = document.createElement('div');
+
+        divPause.style.zIndex = 10;
+        divPause.style.position = 'fixed';
+        divPause.style.textAlign = 'center';
+
+        divPause.textContent = "PAUSE";
+        divPause.style.fontSize = "5vw";
+        divPause.style.fontFamily = "'Arial', sans-serif";
+
+        divPause.style.left =  this.calculatedScaledX(this.brain.width/2 - 86) + 'px';
+        divPause.style.top =  this.calculatedScaledY((this.brain.borderThickness + 10)) + 'px';
+
+        divPause.style.color = "white";
+
+        this.appContainer.append(divPause);
     }
 
     draw() {
@@ -80,5 +137,11 @@ export default class UI {
 
         this.drawBorder();
         this.drawPaddle(this.brain.paddle);
+        this.drawBall(this.brain.ball);
+        this.drawBlocks(this.brain.blocks);
+
+        if (this.brain.gamePaused) {
+            this.drawPause();
+        }
     }
 }

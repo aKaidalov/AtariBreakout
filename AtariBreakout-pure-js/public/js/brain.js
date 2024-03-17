@@ -73,6 +73,7 @@ export class Ball {
 
                 this.bounceBallOffWalls(brain);
                 this.bounceOffPlayer(brain);
+                this.bounceOffBlocks(brain);
             }, 10);
         }
     }
@@ -112,58 +113,78 @@ export class Ball {
             this.velocityX *= -1; //flip X direction left/right
         }
     }
+
+    // Block collision
+    bounceOffBlocks(brain) {
+        brain.blocks.blockArr.forEach(block => {
+            console.log('POPA')
+            if (brain.topCollision(this, block) || brain.bottomCollision(this, block)) {
+                block.break = true;
+                this.velocityY *= -1;
+                brain.blocks.count--;
+                // score += 100;
+            }
+            else if (brain.leftCollision(this, block) || brain.rightCollision(this, block)) {
+                block.break = true;
+                this.velocityX *= -1;
+                brain.blocks.count--;
+                // score += 100;
+            }
+        });
+
+    }
 }
 
-export class BlockCreator {
-    width = 100;
-    height = 30;
-    left = 15;   // x
-    top = 45;    // y
+export class Block {
+    constructor(left, top, width, height, color) {
+        this.width = width;
+        this.height = height;
+        this.left = left;
+        this.top = top;
+        this.color = color;
+        this.break = false; // Assuming 'break' is a state property for each block
+    }
+}
 
-    break = false;
+export class Blocks {
+    blockArr = [];
+
+    width = 122;
+    height = 30;
+    left = 0;   // x
+    top = 0;    // y
     color = 'skyblue';
 
-    blockArr = [];
-    columns = 8;
+    columns = 7;
     rows = 5; //add more as game goes on
     maxRows = 10; //limit how many rows
     gap = 10;
     count = 0;
 
-    // constructor(left, top, width, height) {
-    //     this.left = left;
-    //     this.top = top;
-    //     this.width = width;
-    //     this.height = height;
-    // }
+    constructor(brain) {
+        this.left = brain.borderThickness + 25;
+        this.top = brain.borderThickness + 90;
 
-    constructor() {
+        // TODO: may be the problem occures because i create blocks once in the constr.
+        //  Should be updated dynamically.
         this.createBlocks();
     }
 
-
     createBlocks() {
-        this.blockArr = []; // Clear block array
+        this.blockArr = [];
         for (let c = 0; c < this.columns; c++) {
             for (let r = 0; r < this.rows; r++) {
-                let block = {
-                    left: this.left + (this.width + this.gap) * c, // c * this.blockGap space apart from columns
-                    top: this.top + (this.height + this.gap) * r, // r * this.blockGap space apart from rows
-                    width: this.width,
-                    height: this.height,
-                    break: false,
-                    color: this.color
-                }
-                // let block = new Block(
-                //     this.left + (this.width + this.gap) * c, // c * this.blockGap space apart from columns
-                //     this.top + (this.height + this.gap) * r, // r * this.blockGap space apart from rows
-                //     this.width,
-                //     this.height
-                // );
+                let block = new Block(
+                    this.left + (this.width + this.gap) * c,
+                    this.top + (this.height + this.gap) * r,
+                    this.width,
+                    this.height,
+                    this.color
+                );
                 this.blockArr.push(block);
             }
         }
-        this.count = this.blockArr.length; // length changes during the game, when the ball hits a block
+        this.count = this.blockArr.length; // Update the count after creating blocks
     }
 
 }
@@ -176,7 +197,8 @@ export default class Brain {
 
     paddle = new Paddle(this);
     ball = new Ball(this);
-    blocks = new BlockCreator();
+    blocks = new Blocks(this);
+
 
     // PADDLE ACTIONS
     startMovePaddle(step) {
@@ -197,6 +219,7 @@ export default class Brain {
     }
 
     // BLOCK ACTIONS
+
 
 
     // COLLISION TODO: it has a bug when detects corner collision! - Logic problem.

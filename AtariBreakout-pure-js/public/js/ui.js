@@ -91,8 +91,25 @@ export default class UI {
         this.appContainer.append(divBall);
     }
 
-    drawBlocks(blocks) {
-        blocks.blockArr.forEach(block => {
+    // drawBlock(brain) {
+    //     let divBlock = document.createElement('div');
+    //
+    //     divBlock.style.zIndex = 10;
+    //     divBlock.style.position = 'fixed';
+    //
+    //     // brain.left - brain.borderThickness - brain.blo
+    //     divBlock.style.left = this.calculatedScaledX(brain.block.left) + 'px';
+    //     divBlock.style.top = this.calculatedScaledY(brain.block.top) + 'px';
+    //
+    //     divBlock.style.width = this.calculatedScaledX(brain.block.width) + 'px';
+    //     divBlock.style.height = this.calculatedScaledY(brain.block.height) + 'px';
+    //     divBlock.style.backgroundColor = brain.block.color;
+    //
+    //     this.appContainer.appendChild(divBlock);
+    // }
+
+    drawBlocks(brain) {
+        brain.blocks.blockArr.forEach(block => {
             if (!block.break) { // Draw only if the block wasn't break
                 let divBlock = document.createElement('div');
 
@@ -100,7 +117,7 @@ export default class UI {
                 divBlock.style.position = 'fixed';
 
                 divBlock.style.left = this.calculatedScaledX(block.left) + 'px';
-                divBlock.style.bottom = this.calculatedScaledY(block.height - block.top - block.height) + 'px'; // Positioning blocks from the bottom
+                divBlock.style.top = this.calculatedScaledY(block.top) + 'px';
 
                 divBlock.style.width = this.calculatedScaledX(block.width) + 'px';
                 divBlock.style.height = this.calculatedScaledY(block.height) + 'px';
@@ -136,9 +153,12 @@ export default class UI {
         this.setScreenDimensions();
 
         this.drawBorder();
-        this.drawPaddle(this.brain.paddle);
+        this.drawPaddle(this.brain.paddle); // TODO: Can replace with this.brain and execute this.brain.paddle inside.
         this.drawBall(this.brain.ball);
-        this.drawBlocks(this.brain.blocks);
+
+        // WIP
+        // this.drawBlock(this.brain);
+        this.drawBlocks(this.brain);
 
         if (this.brain.gamePaused) {
             this.drawPause();

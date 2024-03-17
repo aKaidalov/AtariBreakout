@@ -37,8 +37,8 @@ function main() {
         }
     });
 
-
-    document.addEventListener('keydown', (e) => {
+    // TODO: can put this along with Arrow buttons
+    document.addEventListener('keypress', (e) => {
         console.log(e);
         if (e.code === "Space") {
             if (!brain.gamePaused) {

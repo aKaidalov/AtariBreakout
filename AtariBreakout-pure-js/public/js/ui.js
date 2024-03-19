@@ -111,6 +111,7 @@ export default class UI {
     drawBlocks(brain) {
         brain.blocks.blockArr.forEach(block => {
             if (!block.break) { // Draw only if the block wasn't break
+
                 let divBlock = document.createElement('div');
 
                 divBlock.style.zIndex = 10;
@@ -124,6 +125,9 @@ export default class UI {
                 divBlock.style.backgroundColor = block.color;
 
                 this.appContainer.appendChild(divBlock);
+            } else {
+                // this.appContainer.removeChild(block);
+                //TODO: should delete div
             }
         });
     }
@@ -147,21 +151,65 @@ export default class UI {
         this.appContainer.append(divPause);
     }
 
+    drawScore() {
+        let divScore = document.createElement('div');
+
+        divScore.style.zIndex = 10;
+        divScore.style.position = 'fixed';
+
+        divScore.textContent = `${this.brain.score}`;
+        divScore.style.fontSize = "5vw";
+        divScore.style.fontFamily = "'Arial', sans-serif";
+
+        divScore.style.left =  this.calculatedScaledX(this.brain.borderThickness + 25) + 'px';
+        divScore.style.top =  this.calculatedScaledY((this.brain.borderThickness + 10)) + 'px';
+
+        divScore.style.color = "orange";
+
+        this.appContainer.append(divScore);
+    }
+
+    drawLevel() {
+        let divLevel = document.createElement('div');
+
+        divLevel.style.zIndex = 10;
+        divLevel.style.position = 'fixed';
+
+        divLevel.textContent = `${this.brain.blocks.rows}`;
+        divLevel.style.fontSize = "5vw";
+        divLevel.style.fontFamily = "'Arial', sans-serif";
+
+        divLevel.style.left =  this.calculatedScaledX(this.brain.width - (this.brain.borderThickness + 50)) + 'px';
+        divLevel.style.top =  this.calculatedScaledY((this.brain.borderThickness + 10)) + 'px';
+
+        divLevel.style.color = "skyblue";
+
+        this.appContainer.append(divLevel);
+    }
+
+    clearAppContainer() {
+        while (this.appContainer.firstChild) {
+            this.appContainer.removeChild(this.appContainer.firstChild);
+        }
+    }
+
     draw() {
         // clear previous render
-        this.appContainer.innerHTML = '';
+        // this.appContainer.innerHTML = '';
+        this.clearAppContainer()
         this.setScreenDimensions();
 
+        // Game elements
         this.drawBorder();
         this.drawPaddle(this.brain.paddle); // TODO: Can replace with this.brain and execute this.brain.paddle inside.
         this.drawBall(this.brain.ball);
-
-        // WIP
-        // this.drawBlock(this.brain);
         this.drawBlocks(this.brain);
 
+        // Info
         if (this.brain.gamePaused) {
             this.drawPause();
         }
+        this.drawScore();
+        this.drawLevel();
     }
 }

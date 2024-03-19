@@ -65,15 +65,27 @@ export class Ball {
 
     // Move
     startMove(brain) {
-        // this.validateAndFixPosition(borderThickness);
+        // Updates all actions. TODO: move to brain?
         if (!this.#intervalId) {    // == null
             this.#intervalId = setInterval(() => {
+                if (brain.gameOver) {
+                    return;
+                }
+
                 this.left += this.velocityX;
                 this.top += this.velocityY;
 
                 this.bounceBallOffWalls(brain);
                 this.bounceOffPlayer(brain);
                 this.bounceOffBlocks(brain);
+
+                // Don't show broken blocks
+                brain.blocks.updateBlocks();
+
+                //level up
+                if (brain.blocks.count === 0) {
+                    brain.nextLevel();
+                }
             }, 10);
         }
     }
@@ -98,7 +110,11 @@ export class Ball {
             this.velocityX *= -1;
         }
         else if (this.top + this.height >= brain.height) {
-            this.velocityY *= -1;
+            // this.velocityY *= -1;
+
+            //if ball touches bottom side
+            // drawGameOver();
+            brain.gameOver = true;
 
         }
 
@@ -122,13 +138,13 @@ export class Ball {
                 block.break = true;
                 this.velocityY *= -1;
                 brain.blocks.count--;
-                // score += 100;
+                brain.score += 100;
             }
             else if (brain.leftCollision(this, block) || brain.rightCollision(this, block)) {
                 block.break = true;
                 this.velocityX *= -1;
                 brain.blocks.count--;
-                // score += 100;
+                brain.score += 100;
             }
         });
 
@@ -143,6 +159,7 @@ export class Block {
         this.top = top;
         this.color = color;
         this.break = false; // Assuming 'break' is a state property for each block
+        this.div = null; // New property to hold the div reference
     }
 }
 
@@ -156,7 +173,7 @@ export class Blocks {
     color = 'skyblue';
 
     columns = 7;
-    rows = 5; //add more as game goes on
+    rows = 1; //add more as game goes on
     maxRows = 10; //limit how many rows
     gap = 10;
     count = 0;
@@ -187,6 +204,15 @@ export class Blocks {
         this.count = this.blockArr.length; // Update the count after creating blocks
     }
 
+    updateBlocks() {
+        let tempBlockArr = this.blockArr.filter(block => !block.break);
+
+        // Clear the existing block array
+        this.blockArr = [...tempBlockArr];
+
+        // Update the count to reflect current non-broken blocks
+        this.count = this.blockArr.length;
+    }
 }
 
 export default class Brain {
@@ -194,6 +220,8 @@ export default class Brain {
     height = 1000;
     borderThickness = 20;
     gamePaused = false;
+    score = 0;
+    gameOver = false;
 
     paddle = new Paddle(this);
     ball = new Ball(this);
@@ -218,7 +246,29 @@ export default class Brain {
         this.ball.stopMove();
     }
 
-    // BLOCK ACTIONS
+
+    // GAME ACTIONS
+    //level = blockRows
+    nextLevel() {
+        // //return player to start possition
+        // resetPlayer();
+        // //return ball to start possition and shoot in opposite direction
+        // resetBallWithNegativeVelocityX();
+
+        this.score += 100*this.blocks.rows*this.blocks.columns; //bonus points
+        this.blocks.rows = Math.min(this.blocks.rows + 1, this.blocks.maxRows);
+        this.blocks.createBlocks();
+    }
+
+    resetGame() {
+        this.gameOver = false;
+        // resetPlayer();
+        // resetBallWithNegativeVelocityX();
+        this.blocks.blockArray = [];
+        this.blocks.rows = 1;
+        this.score = 0;
+        this.blocks.createBlocks();
+    }
 
 
 

@@ -78,35 +78,22 @@ export default class UI {
 
         divBall.style.zIndex = 10;
         divBall.style.position = 'fixed';
-
         divBall.style.borderRadius = "50%";
+        divBall.style.backgroundColor = ball.color;
 
+        // Assuming calculatedScaledX and calculatedScaledY return scale factors
+        // You need a uniform scale factor for both dimensions
+        let scaleFactor = Math.min(this.calculatedScaledX(ball.width), this.calculatedScaledY(ball.height));
+
+        divBall.style.width = scaleFactor + 'px';
+        divBall.style.height = scaleFactor + 'px';
+
+        // Use the original position calculations, assuming they're based on the container's dimensions
         divBall.style.left = this.calculatedScaledX(ball.left) + 'px';
         divBall.style.top = this.calculatedScaledY(ball.top) + 'px';
 
-        divBall.style.width = this.calculatedScaledX(ball.width) + 'px';
-        divBall.style.height = this.calculatedScaledY(ball.height) + 'px';
-        divBall.style.backgroundColor = ball.color;
-
         this.appContainer.append(divBall);
     }
-
-    // drawBlock(brain) {
-    //     let divBlock = document.createElement('div');
-    //
-    //     divBlock.style.zIndex = 10;
-    //     divBlock.style.position = 'fixed';
-    //
-    //     // brain.left - brain.borderThickness - brain.blo
-    //     divBlock.style.left = this.calculatedScaledX(brain.block.left) + 'px';
-    //     divBlock.style.top = this.calculatedScaledY(brain.block.top) + 'px';
-    //
-    //     divBlock.style.width = this.calculatedScaledX(brain.block.width) + 'px';
-    //     divBlock.style.height = this.calculatedScaledY(brain.block.height) + 'px';
-    //     divBlock.style.backgroundColor = brain.block.color;
-    //
-    //     this.appContainer.appendChild(divBlock);
-    // }
 
     drawBlocks(brain) {
         brain.blocks.blockArr.forEach(block => {
@@ -125,9 +112,6 @@ export default class UI {
                 divBlock.style.backgroundColor = block.color;
 
                 this.appContainer.appendChild(divBlock);
-            } else {
-                // this.appContainer.removeChild(block);
-                //TODO: should delete div
             }
         });
     }
@@ -143,8 +127,9 @@ export default class UI {
         divPause.style.fontSize = "5vw";
         divPause.style.fontFamily = "'Arial', sans-serif";
 
-        divPause.style.left =  this.calculatedScaledX(this.brain.width/2 - 86) + 'px';
-        divPause.style.top =  this.calculatedScaledY((this.brain.borderThickness + 10)) + 'px';
+        divPause.style.left = "50%";
+        divPause.style.top = "8%";
+        divPause.style.transform = "translate(-50%, -50%)";
 
         divPause.style.color = "white";
 
@@ -161,8 +146,9 @@ export default class UI {
         divScore.style.fontSize = "5vw";
         divScore.style.fontFamily = "'Arial', sans-serif";
 
-        divScore.style.left =  this.calculatedScaledX(this.brain.borderThickness + 25) + 'px';
-        divScore.style.top =  this.calculatedScaledY((this.brain.borderThickness + 10)) + 'px';
+        divScore.style.left = "4.4%";
+        divScore.style.top = "8%";
+        divScore.style.transform = "translate(0%, -50%)";
 
         divScore.style.color = "orange";
 
@@ -178,13 +164,84 @@ export default class UI {
         divLevel.textContent = `${this.brain.blocks.rows}`;
         divLevel.style.fontSize = "5vw";
         divLevel.style.fontFamily = "'Arial', sans-serif";
+        divLevel.style.textAlign = 'right';
 
-        divLevel.style.left =  this.calculatedScaledX(this.brain.width - (this.brain.borderThickness + 50)) + 'px';
-        divLevel.style.top =  this.calculatedScaledY((this.brain.borderThickness + 10)) + 'px';
+        divLevel.style.right = "3.9%";
+        divLevel.style.top = "8%";
+        divLevel.style.transform = "translate(0%, -50%)";
 
         divLevel.style.color = "skyblue";
 
         this.appContainer.append(divLevel);
+    }
+
+    drawGameOver() {
+        // Create the GAME OVER div
+        let divGameOver = document.createElement('div');
+
+        divGameOver.style.zIndex = 10;
+        divGameOver.style.position = 'fixed';
+
+        divGameOver.textContent = "GAME OVER";
+        divGameOver.style.fontSize = "10vw";
+        divGameOver.style.fontFamily = "'Arial', sans-serif";
+
+        divGameOver.style.whiteSpace = "nowrap";
+        divGameOver.style.left = "50%";
+        divGameOver.style.top = "50%";
+        divGameOver.style.transform = "translate(-50%, -50%)";
+
+        divGameOver.style.color = "white";
+
+        this.appContainer.append(divGameOver);
+
+        // Create the restart message div
+        this.drawSubtitle()
+
+    }
+
+    drawCelebration() {
+        let divCelebration = document.createElement('div');
+
+        divCelebration.style.zIndex = 10;
+        divCelebration.style.position = 'fixed';
+
+        divCelebration.textContent = "YOU WON!";
+        divCelebration.style.fontSize = "12vw";
+        divCelebration.style.fontFamily = "'Arial', sans-serif";
+
+        divCelebration.style.whiteSpace = "nowrap";
+        divCelebration.style.left = "50%";
+        divCelebration.style.top = "50%";
+        divCelebration.style.transform = "translate(-50%, -50%)";
+
+        divCelebration.style.color = "orange";
+
+        this.appContainer.append(divCelebration);
+
+        // Create the restart message div
+        this.drawSubtitle();
+    }
+
+    drawSubtitle() {
+        let divRestartMessage = document.createElement('div');
+
+        divRestartMessage.style.zIndex = 10;
+        divRestartMessage.style.position = 'fixed';
+
+        divRestartMessage.textContent = "Press 'Space' to restart";
+        divRestartMessage.style.fontSize = "4vw"; // Smaller font size
+        divRestartMessage.style.fontFamily = "'Arial', sans-serif";
+
+        divRestartMessage.style.whiteSpace = "nowrap";
+        divRestartMessage.style.left = "50%";
+        // Position below the GAME OVER div by adjusting the top value
+        divRestartMessage.style.top = "calc(50% + 7vw)"; // Adjust the 10vw to change the distance below GAME OVER
+        divRestartMessage.style.transform = "translate(-50%, 0)"; // Only horizontally centering
+
+        divRestartMessage.style.color = "skyblue";
+
+        this.appContainer.append(divRestartMessage);
     }
 
     clearAppContainer() {
@@ -206,10 +263,17 @@ export default class UI {
         this.drawBlocks(this.brain);
 
         // Info
+        this.drawScore();
+        this.drawLevel();
+
         if (this.brain.gamePaused) {
             this.drawPause();
         }
-        this.drawScore();
-        this.drawLevel();
+        if (this.brain.gameOver && !this.brain.gameIsFinished) {
+            this.drawGameOver();
+        }
+        if (this.brain.gameIsFinished) {
+            this.drawCelebration();
+        }
     }
 }

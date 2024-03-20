@@ -5,7 +5,7 @@ export class Paddle {
     top = 0;    // y
     velocityX = 20;
     color = 'orange'; // TODO: add a class name when create div to change in css
-    #intervalId = null; //TODO: how does it help???
+    intervalId = null; //TODO: how does it help???
 
     constructor(brain) {
         // create element with adaptive size
@@ -16,45 +16,47 @@ export class Paddle {
     validateAndFixPosition(borderThickness) {
         if (this.left < borderThickness) {
             this.left = borderThickness;
-            clearInterval(this.#intervalId);
-            this.#intervalId = null;
+            clearInterval(this.intervalId);
+            this.intervalId = null;
         }
         if (this.left + this.width + borderThickness > 1000) {
             this.left = 1000 - (this.width + borderThickness);
-            clearInterval(this.#intervalId);
-            this.#intervalId = null;
+            clearInterval(this.intervalId);
+            this.intervalId = null;
         }
     }
 
-    startMove(step, borderThickness) {
-        this.validateAndFixPosition(borderThickness);
-        if (!this.#intervalId) {    // == null
-            this.#intervalId = setInterval(() => {
-                // if step is negative move left, otherwise right
-                this.left += step * this.velocityX;
-                this.validateAndFixPosition(borderThickness);   //TODO: why does he repeats this to lines?
-            }, 40);
+    startMove(brain, step, borderThickness) {
+        if (!brain.gameOver || !brain.gameIsFinished){
+            this.validateAndFixPosition(borderThickness);
+            if (!this.intervalId) {    // == null
+                this.intervalId = setInterval(() => {
+                    // if step is negative move left, otherwise right
+                    this.left += step * this.velocityX;
+                    this.validateAndFixPosition(borderThickness);   //TODO: why does he repeats this to lines?
+                }, 20);
+            }
         }
     }
 
     stopMove(borderThickness) {
-        if (this.#intervalId) {
-            clearInterval(this.#intervalId);    //TODO: what happens here?
-            this.#intervalId = null;
+        if (this.intervalId) {
+            clearInterval(this.intervalId);    //TODO: what happens here?
+            this.intervalId = null;
             this.validateAndFixPosition(borderThickness);
         }
     }
 }
 
 export class Ball {
-    width = 30;
-    height = 30;
+    width = 35;
+    height = 35;
     left = 0;   // x
     top = 0;    // y
     velocityX = 3;
     velocityY = 2;
     color = 'white';
-    #intervalId = null;
+    intervalId = null;
 
     constructor(brain) {
         this.left = (brain.width/2) - (this.width/2);
@@ -66,34 +68,48 @@ export class Ball {
     // Move
     startMove(brain) {
         // Updates all actions. TODO: move to brain?
-        if (!this.#intervalId) {    // == null
-            this.#intervalId = setInterval(() => {
+        if (!this.intervalId) {    // == null
+            this.intervalId = setInterval(() => {
                 if (brain.gameOver) {
                     return;
                 }
+
+                console.log(this.velocityX, this.velocityY);
+                console.log(brain.blocks.count);
 
                 this.left += this.velocityX;
                 this.top += this.velocityY;
 
                 this.bounceBallOffWalls(brain);
-                this.bounceOffPlayer(brain);
+                this.bounceOffPaddle(brain);
                 this.bounceOffBlocks(brain);
 
                 // Don't show broken blocks
                 brain.blocks.updateBlocks();
 
+                // If was last level and no blocks left - finish the game
+
+
                 //level up
                 if (brain.blocks.count === 0) {
-                    brain.nextLevel();
+                    // Finish the game if last block was hit
+                    if (brain.blocks.rows === brain.blocks.maxRows) {
+                        brain.gameIsFinished = true; // Explicitly set game finished state
+                        clearInterval(this.intervalId); // Stop ball movement
+                        // Here, you can call a method to display a game completed message
+                        this.gameOver = true;
+                    } else {
+                        brain.nextLevel();
+                    }
                 }
             }, 10);
         }
     }
 
     stopMove() {
-        if (this.#intervalId) {
-            clearInterval(this.#intervalId);
-            this.#intervalId = null;
+        if (this.intervalId) {
+            clearInterval(this.intervalId);
+            this.intervalId = null;
             // this.validateAndFixPosition(borderThickness);
         }
     }
@@ -113,15 +129,17 @@ export class Ball {
             // this.velocityY *= -1;
 
             //if ball touches bottom side
-            // drawGameOver();
             brain.gameOver = true;
-
         }
 
+        //game is FINALLY finished! TODO:FINISH doesn't work
+        if (brain.blocks.rows === brain.blocks.maxRows && brain.blocks.count === 0) {
+            brain.gameIsFinished = true;
+        }
     }
 
-    // Player collision
-    bounceOffPlayer(brain) {
+    // Paddle collision
+    bounceOffPaddle(brain) {
         if (brain.topCollision(this, brain.paddle) || brain.bottomCollision(this, brain.paddle)) {
             this.velocityY *= -1; //flip Y direction up/down
         }
@@ -133,7 +151,6 @@ export class Ball {
     // Block collision
     bounceOffBlocks(brain) {
         brain.blocks.blockArr.forEach(block => {
-            console.log('POPA')
             if (brain.topCollision(this, block) || brain.bottomCollision(this, block)) {
                 block.break = true;
                 this.velocityY *= -1;
@@ -174,16 +191,14 @@ export class Blocks {
 
     columns = 7;
     rows = 1; //add more as game goes on
-    maxRows = 10; //limit how many rows
+    maxRows = 5; //limit how many rows
     gap = 10;
     count = 0;
 
     constructor(brain) {
         this.left = brain.borderThickness + 25;
-        this.top = brain.borderThickness + 90;
+        this.top = brain.borderThickness + 120;
 
-        // TODO: may be the problem occures because i create blocks once in the constr.
-        //  Should be updated dynamically.
         this.createBlocks();
     }
 
@@ -222,6 +237,7 @@ export default class Brain {
     gamePaused = false;
     score = 0;
     gameOver = false;
+    gameIsFinished = false;
 
     paddle = new Paddle(this);
     ball = new Ball(this);
@@ -231,7 +247,7 @@ export default class Brain {
     // PADDLE ACTIONS
     startMovePaddle(step) {
         if (!this.gamePaused){
-            this.paddle.startMove(step, this.borderThickness);
+            this.paddle.startMove(this, step, this.borderThickness);
         }
     }
     stopMovePaddle() {
@@ -250,10 +266,9 @@ export default class Brain {
     // GAME ACTIONS
     //level = blockRows
     nextLevel() {
-        // //return player to start possition
-        // resetPlayer();
-        // //return ball to start possition and shoot in opposite direction
-        // resetBallWithNegativeVelocityX();
+        // Return ball and paddle to start position.
+        this.resetBall(Math.abs(this.ball.velocityX) + 1, Math.abs(this.ball.velocityY) + 1);
+        this.resetPaddle()
 
         this.score += 100*this.blocks.rows*this.blocks.columns; //bonus points
         this.blocks.rows = Math.min(this.blocks.rows + 1, this.blocks.maxRows);
@@ -261,15 +276,39 @@ export default class Brain {
     }
 
     resetGame() {
+        this.resetPaddle();
+        this.resetBall(3, 2);
+        this.resetBlocks();
+
+        // Reset game state
+        this.gamePaused = false;
         this.gameOver = false;
-        // resetPlayer();
-        // resetBallWithNegativeVelocityX();
-        this.blocks.blockArray = [];
-        this.blocks.rows = 1;
+        this.gameIsFinished = false;
         this.score = 0;
-        this.blocks.createBlocks();
     }
 
+    resetPaddle() {
+        this.paddle.left = (this.width / 2) - (this.paddle.width / 2);
+        this.paddle.top = this.height - this.paddle.height - this.borderThickness;
+        clearInterval(this.paddle.intervalId);
+        this.paddle.intervalId = null;
+    }
+
+    resetBall(vx, vy) {
+        this.ball.left = (this.width / 2) - (this.ball.width / 2);
+        this.ball.top = (this.height / 2) - (this.ball.height / 2);
+        this.ball.velocityX = vx; // Reset to original velocity if changed during gameplay
+        this.ball.velocityY = vy; // Reset to original velocity if changed during gameplay
+        if (this.gameOver || this.gameIsFinished){
+            clearInterval(this.ball.intervalId);
+            this.ball.intervalId = null;
+        }
+    }
+
+    resetBlocks() {
+        this.blocks.rows = 1; // Start with initial number of rows
+        this.blocks.createBlocks(); // Re-create the blocks for the new game
+    }
 
 
     // COLLISION TODO: it has a bug when detects corner collision! - Logic problem.

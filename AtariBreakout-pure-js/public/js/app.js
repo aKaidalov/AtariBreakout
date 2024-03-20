@@ -41,7 +41,12 @@ function main() {
     document.addEventListener('keypress', (e) => {
         console.log(e);
         if (e.code === "Space") {
-            if (!brain.gamePaused) {
+            // Either ball-down boarder collision or the game has been finished.
+            if (brain.gameOver || brain.gameIsFinished) {
+                brain.resetGame();
+                brain.startMoveBall();
+            }
+            else if (!brain.gamePaused) {
                 brain.gamePaused = true;
                 brain.stopMoveBall();
             }

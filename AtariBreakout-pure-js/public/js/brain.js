@@ -4,8 +4,8 @@ export class Paddle {
     left = 0;   // x
     top = 0;    // y
     velocityX = 20;
-    color = 'orange'; // TODO: add a class name when create div to change in css
-    intervalId = null; //TODO: how does it help???
+    color = 'orange';
+    intervalId = null;
 
     constructor(brain) {
         // create element with adaptive size
@@ -33,7 +33,7 @@ export class Paddle {
                 this.intervalId = setInterval(() => {
                     // if step is negative move left, otherwise right
                     this.left += step * this.velocityX;
-                    this.validateAndFixPosition(borderThickness);   //TODO: why does he repeats this to lines?
+                    this.validateAndFixPosition(borderThickness);
                 }, 20);
             }
         }
@@ -41,7 +41,7 @@ export class Paddle {
 
     stopMove(borderThickness) {
         if (this.intervalId) {
-            clearInterval(this.intervalId);    //TODO: what happens here?
+            clearInterval(this.intervalId);
             this.intervalId = null;
             this.validateAndFixPosition(borderThickness);
         }
@@ -132,7 +132,7 @@ export class Ball {
             brain.gameOver = true;
         }
 
-        //game is FINALLY finished! TODO:FINISH doesn't work
+        //game is FINALLY finished!
         if (brain.blocks.rows === brain.blocks.maxRows && brain.blocks.count === 0) {
             brain.gameIsFinished = true;
         }

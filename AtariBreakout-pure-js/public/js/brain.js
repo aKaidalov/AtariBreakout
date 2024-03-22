@@ -137,6 +137,8 @@ export default class Brain {
     width = 1000;
     height = 1000;
     borderThickness = 20;
+    marginForCollision = 10; // assume as "margin"
+
 
     #intervalId = null;
 
@@ -258,35 +260,18 @@ export default class Brain {
 
     // COLLISION TODO: it has a bug when detects corner collision! - Logic problem.
     detectCollision(a, b) {
-        return  a.left < b.left + b.width &&  // a's top left corner doens't reach b's top right corner
-            a.left + a.width > b.left &&  // a's top right corner doesn't reach b's top left corner
-            a.top < b.top + b.height && // a's top left corner doesn't reach b's bottom left corner
-            a.top + a.height > b.top;   // a's bottom left corner passes b's top left corner
+        return  a.left <= b.left + b.width &&  // a's top left corner doens't reach b's top right corner
+            a.left + a.width >= b.left &&  // a's top right corner doesn't reach b's top left corner
+            a.top <= b.top + b.height && // a's top left corner doesn't reach b's bottom left corner
+            a.top + a.height >= b.top;   // a's bottom left corner passes b's top left corner
     }
 
-    topCollision(a, b) { // a is above b (ball is above block)
-        return this.detectCollision(a, b) && ((a.top + a.height) >= b.top);
-    }
-
-    bottomCollision(a, b) { // a is bellow b (ball is bellow block)
-        return this.detectCollision(a, b) && ((b.top + b.height) >= a.top);
-    }
-
-    leftCollision(a, b) { // a is left of b (ball is left of block)
-        return this.detectCollision(a, b) && ((a.left + a.width) >= b.left);
-        // return this.detectCollision(a, b) && (a.left + a.width) - b.left <= 0 ;
-    }
-
-    rightCollision(a, b) { // a is right of b (ball is left of block)
-        return this.detectCollision(a, b) && ((b.left + b.width) >= a.left);
-        // return this.detectCollision(a, b) && (b.left + b.width) - a.left <= 0;
-    }
 
     // Border collision
     bounceBallOffWalls() {
-        if (this.ball.top - this.borderThickness <= 0) { // || (ball.y + ball.height) >= boardHeight
+        if (this.ball.top - this.borderThickness <= 0) {
             //if ball touches top of the board
-            this.ball.velocityY *= -1; //reverse direction
+            this.ball.velocityY *= -1;
         }
         else if (this.ball.left - this.borderThickness <= 0 ||
             (this.ball.left + this.ball.width) >= (this.width - this.borderThickness)) {
@@ -306,35 +291,17 @@ export default class Brain {
 
     // Paddle collision
     bounceOffPaddle() {
-
-        if ((this.topCollision(this.ball, this.paddle) || this.bottomCollision(this.ball, this.paddle)) &&
-            (this.leftCollision(this.ball, this.paddle) || this.rightCollision(this.ball, this.paddle))) {
-            console.log("CornerCol")
+        if (this.detectCollision(this.ball, this.paddle)) {
             this.ball.velocityY *= -1; //flip Y direction up/down
-            this.ball.velocityX *= -1; //flip X direction left/right
-        }
-        else if (this.topCollision(this.ball, this.paddle) || this.bottomCollision(this.ball, this.paddle)) {
-            console.log("TopCol")
-            this.ball.velocityY *= -1; //flip Y direction up/down
-        }
-        else if (this.leftCollision(this.ball, this.paddle) || this.rightCollision(this.ball, this.paddle)) {
-            console.log("SideCol")
-            this.ball.velocityX *= -1; //flip X direction left/right
         }
     }
 
     // Block collision
     bounceOffBlocks() {
         this.blocks.blockArr.forEach(block => {
-            if (this.topCollision(this.ball, block) || this.bottomCollision(this.ball, block)) {
+            if (this.detectCollision(this.ball, block)) {
                 block.break = true;
                 this.ball.velocityY *= -1;
-                this.blocks.count--;
-                this.score += 100;
-            }
-            else if (this.leftCollision(this.ball, block) || this.rightCollision(this.ball, block)) {
-                block.break = true;
-                this.ball.velocityX *= -1;
                 this.blocks.count--;
                 this.score += 100;
             }

@@ -3,7 +3,7 @@ export class Paddle {
     height = 30;
     left = 0;   // x
     top = 0;    // y
-    velocityX = 20;
+    velocityX = 5;
     color = 'orange';
     #intervalId = null;
 
@@ -37,7 +37,7 @@ export class Paddle {
                 // if step is negative move left, otherwise right
                 this.left += step * this.velocityX;
                 this.validateAndFixPosition();
-            }, 20);
+            }, 10);
         }
     }
 
@@ -68,6 +68,13 @@ export class Ball {
     move() {
         this.left += this.velocityX;
         this.top += this.velocityY;
+    }
+
+    changeDirectionX() {
+        this.velocityX *= -1;   // reverse X direction
+    }
+    changeDirectionY() {
+        this.velocityY *= -1;   // reverse Y direction
     }
 }
 
@@ -133,12 +140,24 @@ export class Blocks {
     }
 }
 
+export class Player {
+    name = 'default user';
+    score = 0;
+
+    constructor(name) {
+        this.name = name;
+    }
+
+    updateScore(newScore) {
+        this.score = newScore;
+    }
+
+}
+
 export default class Brain {
     width = 1000;
     height = 1000;
     borderThickness = 20;
-    marginForCollision = 10; // assume as "margin"
-
 
     #intervalId = null;
 
@@ -151,9 +170,9 @@ export default class Brain {
     ball = new Ball(this);
     blocks = new Blocks(this);
 
-    constructor() {
-        this.start();
-    }
+    // constructor() {
+    //     this.play();
+    // }
 
     // PADDLE ACTIONS
     startMovePaddle(step) {
@@ -166,17 +185,20 @@ export default class Brain {
     }
 
     // GAME ACTIONS
-    start() {
+    startGame(nickname) {
+        console.log('Starting game for:', nickname); // Debugging
+
+
+        this.play();
+    }
+
+    play() {
         // Updates all actions.
         if (!this.#intervalId) {    // == null
             this.#intervalId = setInterval(() => {
                 if (this.gameOver) {
                     this.stop();
                 }
-
-
-                // console.log(this.ball.velocityX, this.ball.velocityY);
-                // console.log(this.blocks.count);
 
                 this.ball.move();
 
@@ -191,9 +213,7 @@ export default class Brain {
                 if (this.blocks.count === 0) {
                     // Finish the game if last block was hit
                     if (this.blocks.rows === this.blocks.maxRows) {
-                        // this.stop();
                         this.gameIsFinished = true;
-                        // clearInterval(this.#intervalId); // Stop all actions
                         this.gameOver = true;
                     } else {
                         this.nextLevel();
@@ -236,7 +256,7 @@ export default class Brain {
         this.gameIsFinished = false;
         this.score = 0;
 
-        this.start();
+        this.play();
     }
 
     resetPaddle() {
@@ -271,12 +291,12 @@ export default class Brain {
     bounceBallOffWalls() {
         if (this.ball.top - this.borderThickness <= 0) {
             //if ball touches top of the board
-            this.ball.velocityY *= -1;
+            this.ball.changeDirectionY();
         }
         else if (this.ball.left - this.borderThickness <= 0 ||
             (this.ball.left + this.ball.width) >= (this.width - this.borderThickness)) {
             //if ball touches left/right (with top left corner or top right corner)
-            this.ball.velocityX *= -1;
+            this.ball.changeDirectionX();
         }
         else if (this.ball.top + this.ball.height >= this.height) {
             //if ball touches bottom side
@@ -292,7 +312,7 @@ export default class Brain {
     // Paddle collision
     bounceOffPaddle() {
         if (this.detectCollision(this.ball, this.paddle)) {
-            this.ball.velocityY *= -1; //flip Y direction up/down
+            this.ball.changeDirectionY();
         }
     }
 
@@ -301,7 +321,7 @@ export default class Brain {
         this.blocks.blockArr.forEach(block => {
             if (this.detectCollision(this.ball, block)) {
                 block.break = true;
-                this.ball.velocityY *= -1;
+                this.ball.changeDirectionY();
                 this.blocks.count--;
                 this.score += 100;
             }

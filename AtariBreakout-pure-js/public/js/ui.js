@@ -35,7 +35,7 @@ export default class UI {
     drawBorderSingle(left, top, width, height, color) {
         let border = document.createElement('div');
 
-        border.style.zIndex = 10;
+        border.style.zIndex = '10';
         border.style.position = 'fixed';
 
         border.style.left = left + 'px';
@@ -60,7 +60,7 @@ export default class UI {
     drawPaddle(paddle) {
         let divPaddle = document.createElement('div');
 
-        divPaddle.style.zIndex = 10;
+        divPaddle.style.zIndex = '10';
         divPaddle.style.position = 'fixed';
 
         divPaddle.style.left = this.calculatedScaledX(paddle.left) + 'px';
@@ -76,7 +76,7 @@ export default class UI {
     drawBall(ball) {
         let divBall = document.createElement('div');
 
-        divBall.style.zIndex = 10;
+        divBall.style.zIndex = '10';
         divBall.style.position = 'fixed';
         divBall.style.borderRadius = "50%";
         divBall.style.backgroundColor = ball.color;
@@ -101,7 +101,7 @@ export default class UI {
 
                 let divBlock = document.createElement('div');
 
-                divBlock.style.zIndex = 10;
+                divBlock.style.zIndex = '10';
                 divBlock.style.position = 'fixed';
 
                 divBlock.style.left = this.calculatedScaledX(block.left) + 'px';
@@ -119,7 +119,7 @@ export default class UI {
     drawPause() {
         let divPause = document.createElement('div');
 
-        divPause.style.zIndex = 10;
+        divPause.style.zIndex = '10';
         divPause.style.position = 'fixed';
         divPause.style.textAlign = 'center';
 
@@ -139,7 +139,7 @@ export default class UI {
     drawScore() {
         let divScore = document.createElement('div');
 
-        divScore.style.zIndex = 10;
+        divScore.style.zIndex = '10';
         divScore.style.position = 'fixed';
 
         divScore.textContent = `${this.brain.score}`;
@@ -158,7 +158,7 @@ export default class UI {
     drawLevel() {
         let divLevel = document.createElement('div');
 
-        divLevel.style.zIndex = 10;
+        divLevel.style.zIndex = '10';
         divLevel.style.position = 'fixed';
 
         divLevel.textContent = `${this.brain.blocks.rows}`;
@@ -179,7 +179,7 @@ export default class UI {
         // Create the GAME OVER div
         let divGameOver = document.createElement('div');
 
-        divGameOver.style.zIndex = 10;
+        divGameOver.style.zIndex = '10';
         divGameOver.style.position = 'fixed';
 
         divGameOver.textContent = "GAME OVER";
@@ -203,7 +203,7 @@ export default class UI {
     drawCelebration() {
         let divCelebration = document.createElement('div');
 
-        divCelebration.style.zIndex = 10;
+        divCelebration.style.zIndex = '10';
         divCelebration.style.position = 'fixed';
 
         divCelebration.textContent = "YOU WON!";
@@ -226,22 +226,85 @@ export default class UI {
     drawSubtitle() {
         let divRestartMessage = document.createElement('div');
 
-        divRestartMessage.style.zIndex = 10;
+        divRestartMessage.style.zIndex = '10';
         divRestartMessage.style.position = 'fixed';
 
         divRestartMessage.textContent = "Press 'Space' to restart";
-        divRestartMessage.style.fontSize = "4vw"; // Smaller font size
+        divRestartMessage.style.fontSize = "4vw";
         divRestartMessage.style.fontFamily = "'Arial', sans-serif";
 
         divRestartMessage.style.whiteSpace = "nowrap";
         divRestartMessage.style.left = "50%";
         // Position below the GAME OVER div by adjusting the top value
-        divRestartMessage.style.top = "calc(50% + 7vw)"; // Adjust the 10vw to change the distance below GAME OVER
+        divRestartMessage.style.top = "calc(50% + 7vw)"; // Adjust the 7vw to change the distance below GAME OVER
         divRestartMessage.style.transform = "translate(-50%, 0)"; // Only horizontally centering
 
         divRestartMessage.style.color = "skyblue";
 
         this.appContainer.append(divRestartMessage);
+    }
+
+    drawLandingPage() {
+        this.clearAppContainer()
+        this.setScreenDimensions();
+
+        this.createLandingPage();
+    }
+
+    createLandingPage() {
+        const landingPage = document.createElement('div');
+        landingPage.id = 'landing-page';
+        landingPage.style.zIndex = '10';
+        landingPage.style.position = 'fixed';
+        landingPage.style.left = '50%';
+        landingPage.style.top = '35%';
+        landingPage.style.transform = 'translate(-50%, -50%)';
+        landingPage.style.textAlign = 'center';
+        landingPage.style.fontFamily = "'Arial', sans-serif";
+
+        this.drawWelcomeMessage(landingPage);
+        this.drawNicknameInput(landingPage);
+        this.drawPlayButton(landingPage);
+
+        // Append the landing page to the app container
+        this.appContainer.appendChild(landingPage);
+    }
+
+    drawWelcomeMessage(landingPage) {
+        // Welcome Message
+        const welcomeMessage = document.createElement('h1');
+        welcomeMessage.textContent = 'Welcome to Atari Breakout!';
+        welcomeMessage.style.fontSize = '2vw';
+        welcomeMessage.style.color = "skyblue";
+
+        landingPage.appendChild(welcomeMessage);
+    }
+    drawNicknameInput(landingPage) {
+        // Nickname Input
+        const nicknameInput = document.createElement('input');
+        nicknameInput.type = 'text';
+        nicknameInput.id = 'nickname';
+        nicknameInput.placeholder = 'Enter your nickname';
+        nicknameInput.style.marginTop = '20px';
+
+        landingPage.appendChild(nicknameInput);
+    }
+    drawPlayButton(landingPage) {
+        // Play Button
+        const playButton = document.createElement('button');
+        playButton.id = 'play-button';
+        playButton.textContent = 'Play';
+        playButton.style.marginTop = '20px';
+        playButton.style.fontSize = '1vw';
+        playButton.style.padding = '10px 20px';
+        playButton.style.cursor = 'pointer';
+
+        landingPage.appendChild(playButton);
+    }
+
+    hideLandingPage() {
+        // Hide the landing page
+        document.getElementById('landing-page').style.display = 'none';
     }
 
     clearAppContainer() {
@@ -251,14 +314,14 @@ export default class UI {
     }
 
     draw() {
-        // clear previous render
-        // this.appContainer.innerHTML = '';
+
         this.clearAppContainer()
         this.setScreenDimensions();
 
+
         // Game elements
         this.drawBorder();
-        this.drawPaddle(this.brain.paddle); // TODO: Can replace with this.brain and execute this.brain.paddle inside.
+        this.drawPaddle(this.brain.paddle);
         this.drawBall(this.brain.ball);
         this.drawBlocks(this.brain);
 

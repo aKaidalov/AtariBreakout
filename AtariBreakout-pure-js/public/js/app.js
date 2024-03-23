@@ -14,6 +14,22 @@ function main() {
     let brain = new Brain();
     let ui = new UI(brain, appDiv);
 
+    ui.drawLandingPage();
+
+    // Event listener for the play button
+    document.addEventListener('click', () => {
+        const nickname = document.getElementById('nickname').value.trim();
+        if (nickname) {
+            //
+            brain.startGame(nickname);
+            ui.hideLandingPage();
+
+            // Update UI
+            uiDrawRepeater(ui);
+        } else {
+            alert('Please enter a nickname to continue.');
+        }
+    });
 
     document.addEventListener('keydown', (e) => {
         // console.log(e);
@@ -52,14 +68,10 @@ function main() {
             }
             else if (brain.gamePaused) {
                 brain.gamePaused = false;
-                brain.start();
+                brain.play();
             }
         }
     });
-
-
-    // Update UI
-    uiDrawRepeater(ui);
 }
 
 // ============== ENTRY POINT ==============

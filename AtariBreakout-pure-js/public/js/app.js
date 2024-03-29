@@ -2,11 +2,44 @@ import Brain from "./brain.js";
 import UI from "./ui.js";
 
 // recursively update UI
-function uiDrawRepeater(ui) {
+function uiDrawRepeater(ui, brain) {
     setTimeout(() => {
-        ui.draw();
-        uiDrawRepeater(ui);
+        if (brain.gameStarted) {
+            ui.draw();
+            uiDrawRepeater(ui, brain);
+        }
     }, 0);
+}
+
+function setupPlayButton(brain, ui) {
+    const playButton = document.getElementById('play-button');
+    const usernameInput = document.getElementById('username');
+
+    // Function to handle play action
+    const playAction = () => {
+        const username = usernameInput.value.trim();
+        if (username) {
+            brain.startGame(username);
+            ui.hideLandingPage();
+            uiDrawRepeater(ui, brain);
+        } else {
+            alert('Please enter a username to continue.');
+        }
+    };
+
+    // Attach click event listener to the play button
+    if (playButton) {
+        playButton.addEventListener('click', playAction);
+    }
+
+    // Attach keypress event listener to the username input
+    if (usernameInput) {
+        usernameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                playAction();
+            }
+        });
+    }
 }
 
 function main() {
@@ -14,22 +47,10 @@ function main() {
     let brain = new Brain();
     let ui = new UI(brain, appDiv);
 
+    // Enter username
     ui.drawLandingPage();
+    setupPlayButton(brain, ui); // Set up the play button initially
 
-    // Event listener for the play button
-    document.addEventListener('click', () => {
-        const nickname = document.getElementById('nickname').value.trim();
-        if (nickname) {
-            //
-            brain.startGame(nickname);
-            ui.hideLandingPage();
-
-            // Update UI
-            uiDrawRepeater(ui);
-        } else {
-            alert('Please enter a nickname to continue.');
-        }
-    });
 
     document.addEventListener('keydown', (e) => {
         // console.log(e);
@@ -57,7 +78,7 @@ function main() {
 
     document.addEventListener('keypress', (e) => {
         // console.log(e);
-        if (e.code === "Space") {
+        if (e.code === 'Space') {
             // Either ball-down boarder collision or the game has been finished.
             if (brain.gameOver || brain.gameIsFinished) {
                 brain.resetGame();
@@ -69,6 +90,12 @@ function main() {
             else if (brain.gamePaused) {
                 brain.gamePaused = false;
                 brain.play();
+            }
+        } else if (e.code === 'KeyE') {
+            if (brain.gameOver || brain.gameIsFinished) {
+                brain.gameStarted = false;
+                ui.drawLandingPage();
+                setupPlayButton(brain, ui);
             }
         }
     });

@@ -32,6 +32,8 @@ export default class UI {
         return y * this.scaleY | 0;
     }
 
+
+    // GAME ELEMENTS
     drawBorderSingle(left, top, width, height, color) {
         let border = document.createElement('div');
 
@@ -116,6 +118,8 @@ export default class UI {
         });
     }
 
+
+    // INFO
     drawPause() {
         let divPause = document.createElement('div');
 
@@ -176,74 +180,79 @@ export default class UI {
     }
 
     drawGameOver() {
-        // Create the GAME OVER div
+        // Flex container for game over and messages
+        let divFlexContainer = this.createFlexContainer();
+
+        // Game Over element
         let divGameOver = document.createElement('div');
-
-        divGameOver.style.zIndex = '10';
-        divGameOver.style.position = 'fixed';
-
         divGameOver.textContent = "GAME OVER";
         divGameOver.style.fontSize = "10vw";
         divGameOver.style.fontFamily = "'Arial', sans-serif";
-
-        divGameOver.style.whiteSpace = "nowrap";
-        divGameOver.style.left = "50%";
-        divGameOver.style.top = "50%";
-        divGameOver.style.transform = "translate(-50%, -50%)";
-
         divGameOver.style.color = "white";
 
-        this.appContainer.append(divGameOver);
+        // Append Game Over element to flex container
+        divFlexContainer.appendChild(divGameOver);
 
-        // Create the restart message div
-        this.drawSubtitle()
+        // Create and append restart and exit messages to flex container
+        let divRestartMessage = this.createInfoMessage("Press 'Space' to restart", "skyblue", "4vw");
+        let divExitMessage = this.createInfoMessage("Press 'E' to exit", "grey", "4vw");
+        divFlexContainer.appendChild(divRestartMessage);
+        divFlexContainer.appendChild(divExitMessage);
 
+        // Append the flex container to the app container
+        this.appContainer.appendChild(divFlexContainer);
     }
-
     drawCelebration() {
-        let divCelebration = document.createElement('div');
+        // Flex container for game over and messages
+        let divFlexContainer = this.createFlexContainer();
 
-        divCelebration.style.zIndex = '10';
-        divCelebration.style.position = 'fixed';
+        // Game Over element
+        let divGameOver = document.createElement('div');
+        divGameOver.textContent = "YOU WON!";
+        divGameOver.style.fontSize = "12vw";
+        divGameOver.style.fontFamily = "'Arial', sans-serif";
+        divGameOver.style.color = "orange";
 
-        divCelebration.textContent = "YOU WON!";
-        divCelebration.style.fontSize = "12vw";
-        divCelebration.style.fontFamily = "'Arial', sans-serif";
+        // Append Game Over element to flex container
+        divFlexContainer.appendChild(divGameOver);
 
-        divCelebration.style.whiteSpace = "nowrap";
-        divCelebration.style.left = "50%";
-        divCelebration.style.top = "50%";
-        divCelebration.style.transform = "translate(-50%, -50%)";
+        // Create and append restart and exit messages to flex container
+        let divRestartMessage = this.createInfoMessage("Press 'Space' to restart", "skyblue", "4vw");
+        let divExitMessage = this.createInfoMessage("Press 'E' to exit", "grey", "4vw");
+        divFlexContainer.appendChild(divRestartMessage);
+        divFlexContainer.appendChild(divExitMessage);
 
-        divCelebration.style.color = "orange";
-
-        this.appContainer.append(divCelebration);
-
-        // Create the restart message div
-        this.drawSubtitle();
+        // Append the flex container to the app container
+        this.appContainer.appendChild(divFlexContainer);
     }
 
-    drawSubtitle() {
-        let divRestartMessage = document.createElement('div');
-
-        divRestartMessage.style.zIndex = '10';
-        divRestartMessage.style.position = 'fixed';
-
-        divRestartMessage.textContent = "Press 'Space' to restart";
-        divRestartMessage.style.fontSize = "4vw";
-        divRestartMessage.style.fontFamily = "'Arial', sans-serif";
-
-        divRestartMessage.style.whiteSpace = "nowrap";
-        divRestartMessage.style.left = "50%";
-        // Position below the GAME OVER div by adjusting the top value
-        divRestartMessage.style.top = "calc(50% + 7vw)"; // Adjust the 7vw to change the distance below GAME OVER
-        divRestartMessage.style.transform = "translate(-50%, 0)"; // Only horizontally centering
-
-        divRestartMessage.style.color = "skyblue";
-
-        this.appContainer.append(divRestartMessage);
+    createFlexContainer() {
+        let divFlexContainer = document.createElement('div');
+        divFlexContainer.style.display = 'flex';
+        divFlexContainer.style.flexDirection = 'column';
+        divFlexContainer.style.alignItems = 'left';
+        divFlexContainer.style.justifyContent = 'center';
+        divFlexContainer.style.position = 'fixed';
+        divFlexContainer.style.left = '50%';
+        divFlexContainer.style.top = '50%';
+        divFlexContainer.style.transform = 'translate(-50%, -50%)';
+        divFlexContainer.style.zIndex = '10';
+        divFlexContainer.style.whiteSpace = "nowrap";
+        return divFlexContainer;
     }
 
+    // Helper function to create info message divs
+    createInfoMessage(textContent, color, fontSize) {
+        let divMessage = document.createElement('div');
+        divMessage.textContent = textContent;
+        divMessage.style.fontSize = fontSize;
+        divMessage.style.fontFamily = "'Arial', sans-serif";
+        divMessage.style.color = color;
+        return divMessage;
+    }
+
+
+    // LANDING PAGE
     drawLandingPage() {
         this.clearAppContainer()
         this.setScreenDimensions();
@@ -253,6 +262,7 @@ export default class UI {
 
     createLandingPage() {
         const landingPage = document.createElement('div');
+
         landingPage.id = 'landing-page';
         landingPage.style.zIndex = '10';
         landingPage.style.position = 'fixed';
@@ -263,35 +273,35 @@ export default class UI {
         landingPage.style.fontFamily = "'Arial', sans-serif";
 
         this.drawWelcomeMessage(landingPage);
-        this.drawNicknameInput(landingPage);
+        this.drawUsernameInput(landingPage);
         this.drawPlayButton(landingPage);
+        this.drawPlayersList(landingPage);
 
-        // Append the landing page to the app container
         this.appContainer.appendChild(landingPage);
     }
 
     drawWelcomeMessage(landingPage) {
-        // Welcome Message
         const welcomeMessage = document.createElement('h1');
+
         welcomeMessage.textContent = 'Welcome to Atari Breakout!';
         welcomeMessage.style.fontSize = '2vw';
         welcomeMessage.style.color = "skyblue";
 
         landingPage.appendChild(welcomeMessage);
     }
-    drawNicknameInput(landingPage) {
-        // Nickname Input
-        const nicknameInput = document.createElement('input');
-        nicknameInput.type = 'text';
-        nicknameInput.id = 'nickname';
-        nicknameInput.placeholder = 'Enter your nickname';
-        nicknameInput.style.marginTop = '20px';
+    drawUsernameInput(landingPage) {
+        const usernameInput = document.createElement('input');
 
-        landingPage.appendChild(nicknameInput);
+        usernameInput.type = 'text';
+        usernameInput.id = 'username';
+        usernameInput.placeholder = 'Enter your username';
+        usernameInput.style.marginTop = '20px';
+
+        landingPage.appendChild(usernameInput);
     }
     drawPlayButton(landingPage) {
-        // Play Button
         const playButton = document.createElement('button');
+
         playButton.id = 'play-button';
         playButton.textContent = 'Play';
         playButton.style.marginTop = '20px';
@@ -302,11 +312,46 @@ export default class UI {
         landingPage.appendChild(playButton);
     }
 
-    hideLandingPage() {
-        // Hide the landing page
-        document.getElementById('landing-page').style.display = 'none';
+    drawPlayersList(landingPage) {
+        const playersListContainer = document.createElement('div');
+
+        playersListContainer.id = 'players-list';
+        playersListContainer.style.marginTop = '30px';
+        playersListContainer.style.textAlign = 'center';
+        playersListContainer.style.color = 'gray';
+
+        landingPage.appendChild(playersListContainer);
+
+        // Call drawCurrentBestPlayers to populate the list
+        this.drawCurrentBestPlayers(playersListContainer);
     }
 
+    drawCurrentBestPlayers(playersListContainer) {
+        if (!this.brain || !this.brain.players || !this.brain.players.length) {
+            const noPlayersMessage = document.createElement('p');
+            noPlayersMessage.textContent = 'No players registered yet.';
+            playersListContainer.appendChild(noPlayersMessage);
+            return;
+        }
+
+        // Iterate through the players and create an entry for each
+        this.brain.players.forEach((player, index) => {
+            const playerEntry = document.createElement('p');
+            playerEntry.textContent = `${index + 1}. ${player.username} - ${player.score}`;
+            playerEntry.style.margin = '5px 0'; // Add some spacing between player entries
+
+            playersListContainer.appendChild(playerEntry);
+        });
+    }
+
+    hideLandingPage() {
+        document.getElementById('landing-page').style.visibility = 'hidden';
+    }
+    showLandingPage() {
+        document.getElementById('landing-page').style.visibility = 'visible';
+    }
+
+    // MAIN FUNCTION
     clearAppContainer() {
         while (this.appContainer.firstChild) {
             this.appContainer.removeChild(this.appContainer.firstChild);
@@ -314,10 +359,8 @@ export default class UI {
     }
 
     draw() {
-
         this.clearAppContainer()
         this.setScreenDimensions();
-
 
         // Game elements
         this.drawBorder();

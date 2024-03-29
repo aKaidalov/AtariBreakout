@@ -101,7 +101,7 @@ export class Blocks {
 
     columns = 7;
     rows = 1; // Add more as game goes on. Also rows === level of the game
-    maxRows = 5; // Limit how many rows
+    maxRows = 1; // Limit how many rows
     gap = 10;
     count = 0;
 
@@ -141,15 +141,17 @@ export class Blocks {
 }
 
 export class Player {
-    name = 'default user';
+    username = 'default user';
     score = 0;
 
-    constructor(name) {
-        this.name = name;
+    constructor(username) {
+        this.username = username;
     }
 
     updateScore(newScore) {
-        this.score = newScore;
+        if (this.score < newScore) {
+            this.score = newScore;
+        }
     }
 
 }
@@ -161,6 +163,10 @@ export default class Brain {
 
     #intervalId = null;
 
+    players = [];
+    currentPlayer = null;
+
+    gameStarted = false; // Is used to decide if the landing page must be shown or not
     gamePaused = false;
     score = 0;
     gameOver = false;
@@ -170,9 +176,6 @@ export default class Brain {
     ball = new Ball(this);
     blocks = new Blocks(this);
 
-    // constructor() {
-    //     this.play();
-    // }
 
     // PADDLE ACTIONS
     startMovePaddle(step) {
@@ -185,18 +188,34 @@ export default class Brain {
     }
 
     // GAME ACTIONS
-    startGame(nickname) {
-        console.log('Starting game for:', nickname); // Debugging
+    startGame(username) {
+        this.resetGame();
 
+        console.log('Starting game for:', username); // Debugging
+
+        // Find existing player or create a new one
+        this.createCurrentPlayer(username);
 
         this.play();
+    }
+
+    createCurrentPlayer(username) {
+        let existingPlayer = this.players.find(player => player.username === username);
+
+        if (existingPlayer) {
+            this.currentPlayer = existingPlayer;
+        }
+        else {
+            this.currentPlayer = new Player(username);
+            this.players.push(this.currentPlayer);
+        }
     }
 
     play() {
         // Updates all actions.
         if (!this.#intervalId) {    // == null
             this.#intervalId = setInterval(() => {
-                if (this.gameOver) {
+                if (this.gameOver || this.gameIsFinished) {
                     this.stop();
                 }
 
@@ -214,7 +233,7 @@ export default class Brain {
                     // Finish the game if last block was hit
                     if (this.blocks.rows === this.blocks.maxRows) {
                         this.gameIsFinished = true;
-                        this.gameOver = true;
+                        // this.gameOver = true;
                     } else {
                         this.nextLevel();
                     }
@@ -227,7 +246,19 @@ export default class Brain {
         if (this.#intervalId) {
             clearInterval(this.#intervalId);
             this.#intervalId = null;
+
+            this.currentPlayer.updateScore(this.score);
+
+            this.filterBestPlayers();
         }
+    }
+
+    // To help display on the landing page
+    // specific amount of players.
+    filterBestPlayers() {
+        // Keep and sort best players
+        const playersToDisplay = 5;
+        this.players.sort((a, b) => b.score - a.score).splice(playersToDisplay);
     }
 
 
@@ -251,6 +282,7 @@ export default class Brain {
         this.resetBlocks();
 
         // Reset game state
+        this.gameStarted = true; // shows that ui should be recursively updated to display the game
         this.gamePaused = false;
         this.gameOver = false;
         this.gameIsFinished = false;

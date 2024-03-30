@@ -50,7 +50,7 @@ export default class UI {
         this.appContainer.append(border);
     }
 
-    drawBorder() {
+    drawBorders() {
         // top
         this.drawBorderSingle(0, 0, this.width, this.calculatedScaledY(this.brain.borderThickness), 'skyblue');
         // left
@@ -129,7 +129,7 @@ export default class UI {
 
         divPause.textContent = "PAUSE";
         divPause.style.fontSize = "5vw";
-        divPause.style.fontFamily = "'Arial', sans-serif";
+        divPause.style.fontFamily = "'ArcadeClassic', sans-serif";
 
         divPause.style.left = "50%";
         divPause.style.top = "8%";
@@ -148,7 +148,7 @@ export default class UI {
 
         divScore.textContent = `${this.brain.score}`;
         divScore.style.fontSize = "5vw";
-        divScore.style.fontFamily = "'Arial', sans-serif";
+        divScore.style.fontFamily = "'ArcadeClassic', sans-serif";
 
         divScore.style.left = "4.4%";
         divScore.style.top = "8%";
@@ -167,7 +167,7 @@ export default class UI {
 
         divLevel.textContent = `${this.brain.blocks.rows}`;
         divLevel.style.fontSize = "5vw";
-        divLevel.style.fontFamily = "'Arial', sans-serif";
+        divLevel.style.fontFamily = "'ArcadeClassic', sans-serif";
         divLevel.style.textAlign = 'right';
 
         divLevel.style.right = "3.9%";
@@ -187,15 +187,15 @@ export default class UI {
         let divGameOver = document.createElement('div');
         divGameOver.textContent = "GAME OVER";
         divGameOver.style.fontSize = "10vw";
-        divGameOver.style.fontFamily = "'Arial', sans-serif";
+        divGameOver.style.fontFamily = "'ArcadeClassic', sans-serif";
         divGameOver.style.color = "white";
 
         // Append Game Over element to flex container
         divFlexContainer.appendChild(divGameOver);
 
         // Create and append restart and exit messages to flex container
-        let divRestartMessage = this.createInfoMessage("Press 'Space' to restart", "skyblue", "4vw");
-        let divExitMessage = this.createInfoMessage("Press 'E' to exit", "grey", "4vw");
+        let divRestartMessage = this.createInfoMessage("Press 'Space' to restart", "skyblue", "3vw");
+        let divExitMessage = this.createInfoMessage("Press 'E' to exit", "grey", "3vw");
         divFlexContainer.appendChild(divRestartMessage);
         divFlexContainer.appendChild(divExitMessage);
 
@@ -210,15 +210,15 @@ export default class UI {
         let divGameOver = document.createElement('div');
         divGameOver.textContent = "YOU WON!";
         divGameOver.style.fontSize = "12vw";
-        divGameOver.style.fontFamily = "'Arial', sans-serif";
+        divGameOver.style.fontFamily = "'ArcadeClassic', sans-serif";
         divGameOver.style.color = "orange";
 
         // Append Game Over element to flex container
         divFlexContainer.appendChild(divGameOver);
 
         // Create and append restart and exit messages to flex container
-        let divRestartMessage = this.createInfoMessage("Press 'Space' to restart", "skyblue", "4vw");
-        let divExitMessage = this.createInfoMessage("Press 'E' to exit", "grey", "4vw");
+        let divRestartMessage = this.createInfoMessage("Press 'Space' to restart", "skyblue", "3vw");
+        let divExitMessage = this.createInfoMessage("Press 'E' to exit", "grey", "3vw");
         divFlexContainer.appendChild(divRestartMessage);
         divFlexContainer.appendChild(divExitMessage);
 
@@ -246,7 +246,7 @@ export default class UI {
         let divMessage = document.createElement('div');
         divMessage.textContent = textContent;
         divMessage.style.fontSize = fontSize;
-        divMessage.style.fontFamily = "'Arial', sans-serif";
+        divMessage.style.fontFamily = "'ArcadeClassic', sans-serif";
         divMessage.style.color = color;
         return divMessage;
     }
@@ -257,6 +257,7 @@ export default class UI {
         this.clearAppContainer()
         this.setScreenDimensions();
 
+        this.drawBorders();
         this.createLandingPage();
     }
 
@@ -266,11 +267,18 @@ export default class UI {
         landingPage.id = 'landing-page';
         landingPage.style.zIndex = '10';
         landingPage.style.position = 'fixed';
+        landingPage.style.display = 'flex'; // Use Flexbox
+        landingPage.style.flexDirection = 'column'; // Stack children vertically
+        landingPage.style.alignItems = 'center'; // Center items horizontally
+        landingPage.style.justifyContent = 'center'; // Center items vertically
         landingPage.style.left = '50%';
-        landingPage.style.top = '35%';
+        landingPage.style.top = '50%';
         landingPage.style.transform = 'translate(-50%, -50%)';
+        landingPage.style.width = '80vw'; // Adjust width as needed
+        landingPage.style.maxWidth = '800px'; // Set a max width if desired
         landingPage.style.textAlign = 'center';
-        landingPage.style.fontFamily = "'Arial', sans-serif";
+        landingPage.style.fontFamily = "'ArcadeClassic', sans-serif";
+        landingPage.style.gap = '0.2vh'; // Space between items
 
         this.drawWelcomeMessage(landingPage);
         this.drawUsernameInput(landingPage);
@@ -280,11 +288,12 @@ export default class UI {
         this.appContainer.appendChild(landingPage);
     }
 
+
     drawWelcomeMessage(landingPage) {
         const welcomeMessage = document.createElement('h1');
 
-        welcomeMessage.textContent = 'Welcome to Atari Breakout!';
-        welcomeMessage.style.fontSize = '2vw';
+        welcomeMessage.innerHTML = 'Atari<br>Breakout';
+        welcomeMessage.style.fontSize = '7vw';
         welcomeMessage.style.color = "skyblue";
 
         landingPage.appendChild(welcomeMessage);
@@ -295,19 +304,29 @@ export default class UI {
         usernameInput.type = 'text';
         usernameInput.id = 'username';
         usernameInput.placeholder = 'Enter your username';
-        usernameInput.style.marginTop = '20px';
+        usernameInput.style.fontSize = '1.5vw'; // Make font size responsive
+        usernameInput.style.fontFamily = "'ArcadeClassic', sans-serif";
+        usernameInput.style.padding = '1vh 1vw'; // Padding responsive to viewport
+        usernameInput.style.width = '30vw'; // Make input width responsive
+        usernameInput.style.height = '4vh';
 
         landingPage.appendChild(usernameInput);
     }
+
     drawPlayButton(landingPage) {
         const playButton = document.createElement('button');
 
         playButton.id = 'play-button';
         playButton.textContent = 'Play';
-        playButton.style.marginTop = '20px';
-        playButton.style.fontSize = '1vw';
-        playButton.style.padding = '10px 20px';
+        playButton.style.fontSize = '1.5vw';
+        playButton.style.padding = '1vh 2vw'; // Ensure the padding matches the input for consistent height
         playButton.style.cursor = 'pointer';
+        playButton.style.fontFamily = "'ArcadeClassic', sans-serif";
+        playButton.style.color = 'black';
+        playButton.style.background = 'orange';
+        playButton.style.height = '5vh'; // Ensure this matches the input field's height for consistency
+        playButton.style.width = 'auto'; // Allow width to adjust based on content and padding
+
 
         landingPage.appendChild(playButton);
     }
@@ -316,9 +335,10 @@ export default class UI {
         const playersListContainer = document.createElement('div');
 
         playersListContainer.id = 'players-list';
-        playersListContainer.style.marginTop = '30px';
+        playersListContainer.style.marginTop = '3vh';
         playersListContainer.style.textAlign = 'center';
         playersListContainer.style.color = 'gray';
+        playersListContainer.style.fontSize = '1.5vw'; // Responsive font size
 
         landingPage.appendChild(playersListContainer);
 
@@ -338,7 +358,7 @@ export default class UI {
         this.brain.players.forEach((player, index) => {
             const playerEntry = document.createElement('p');
             playerEntry.textContent = `${index + 1}. ${player.username} - ${player.score}`;
-            playerEntry.style.margin = '5px 0'; // Add some spacing between player entries
+            playerEntry.style.margin = '1vh 0'; // Responsive spacing
 
             playersListContainer.appendChild(playerEntry);
         });
@@ -346,9 +366,6 @@ export default class UI {
 
     hideLandingPage() {
         document.getElementById('landing-page').style.visibility = 'hidden';
-    }
-    showLandingPage() {
-        document.getElementById('landing-page').style.visibility = 'visible';
     }
 
     // MAIN FUNCTION
@@ -363,7 +380,7 @@ export default class UI {
         this.setScreenDimensions();
 
         // Game elements
-        this.drawBorder();
+        this.drawBorders();
         this.drawPaddle(this.brain.paddle);
         this.drawBall(this.brain.ball);
         this.drawBlocks(this.brain);

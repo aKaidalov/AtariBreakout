@@ -101,7 +101,7 @@ export class Blocks {
 
     columns = 7;
     rows = 1; // Add more as game goes on. Also rows === level of the game
-    maxRows = 1; // Limit how many rows
+    maxRows = 5; // Limit how many rows
     gap = 10;
     count = 0;
 
@@ -191,7 +191,8 @@ export default class Brain {
     startGame(username) {
         this.resetGame();
 
-        console.log('Starting game for:', username); // Debugging
+        // Convert to upper because ArcadeClassic font has only upper letters
+        console.log('Starting game for:', username.toUpperCase()); // Debugging
 
         // Find existing player or create a new one
         this.createCurrentPlayer(username);
@@ -200,7 +201,8 @@ export default class Brain {
     }
 
     createCurrentPlayer(username) {
-        let existingPlayer = this.players.find(player => player.username === username);
+        // While main font is ArcadeClassic there should be .toUpperCase()
+        let existingPlayer = this.players.find(player => player.username.toUpperCase() === username.toUpperCase());
 
         if (existingPlayer) {
             this.currentPlayer = existingPlayer;

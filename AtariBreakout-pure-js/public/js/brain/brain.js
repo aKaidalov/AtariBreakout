@@ -1,160 +1,7 @@
-export class Paddle {
-    width = 200;
-    height = 30;
-    left = 0;   // x
-    top = 0;    // y
-    velocityX = 5;
-    color = 'orange';
-    #intervalId = null;
-
-    brain = null;
-
-    constructor(brain) {
-        this.brain = brain
-
-        // create element with adaptive size
-        this.left = (brain.width/2) - (this.width/2);
-        this.top = brain.height - this.height - brain.borderThickness;
-    }
-
-    validateAndFixPosition() {
-        if (this.left < this.brain.borderThickness) {
-            this.left = this.brain.borderThickness;
-            clearInterval(this.#intervalId);
-            this.#intervalId = null;
-        }
-        if (this.left + this.width + this.brain.borderThickness > 1000) {
-            this.left = 1000 - (this.width + this.brain.borderThickness);
-            clearInterval(this.#intervalId);
-            this.#intervalId = null;
-        }
-    }
-
-    startMove(step) {
-        this.validateAndFixPosition();
-        if (!this.#intervalId) {    // == null
-            this.#intervalId = setInterval(() => {
-                // if step is negative move left, otherwise right
-                this.left += step * this.velocityX;
-                this.validateAndFixPosition();
-            }, 10);
-        }
-    }
-
-    stopMove() {
-        if (this.#intervalId) {
-            clearInterval(this.#intervalId);
-            this.#intervalId = null;
-            this.validateAndFixPosition();
-        }
-    }
-}
-
-export class Ball {
-    width = 35;
-    height = 35;
-    left = 0;   // x
-    top = 0;    // y
-    velocityX = 3;
-    velocityY = 2;
-    color = 'white';
-
-    constructor(brain) {
-        this.left = (brain.width/2) - (this.width/2);
-        this.top = (brain.height/2) - (this.height/2);
-    }
-
-    // Move
-    move() {
-        this.left += this.velocityX;
-        this.top += this.velocityY;
-    }
-
-    changeDirectionX() {
-        this.velocityX *= -1;   // reverse X direction
-    }
-    changeDirectionY() {
-        this.velocityY *= -1;   // reverse Y direction
-    }
-}
-
-export class Block {
-    constructor(left, top, width, height, color) {
-        this.width = width;
-        this.height = height;
-        this.left = left;
-        this.top = top;
-        this.color = color;
-        this.break = false; // Assuming 'break' is a state property for each block
-        this.div = null; // New property to hold the div reference
-    }
-}
-
-export class Blocks {
-    blockArr = [];
-
-    blockWidth = 122;
-    blockHeight = 30;
-    blockLeft = 0;   // x
-    blockTop = 0;    // y
-    blockColor = 'skyblue';
-
-    columns = 7;
-    rows = 1; // Add more as game goes on. Also rows === level of the game
-    maxRows = 5; // Limit how many rows
-    gap = 10;
-    count = 0;
-
-    constructor(brain) {
-        this.blockLeft = brain.borderThickness + 25;
-        this.blockTop = brain.borderThickness + 120;
-
-        this.createBlocks();
-    }
-
-    createBlocks() {
-        this.blockArr = [];
-        for (let c = 0; c < this.columns; c++) {
-            for (let r = 0; r < this.rows; r++) {
-                let block = new Block(
-                    this.blockLeft + (this.blockWidth + this.gap) * c,
-                    this.blockTop + (this.blockHeight + this.gap) * r,
-                    this.blockWidth,
-                    this.blockHeight,
-                    this.blockColor
-                );
-                this.blockArr.push(block);
-            }
-        }
-        this.count = this.blockArr.length; // Update the count after creating blocks
-    }
-
-    updateBlocks() {
-        let tempBlockArr = this.blockArr.filter(block => !block.break);
-
-        // Clear the existing block array
-        this.blockArr = [...tempBlockArr];
-
-        // Update the count to reflect current non-broken blocks
-        this.count = this.blockArr.length;
-    }
-}
-
-export class Player {
-    username = 'default user';
-    score = 0;
-
-    constructor(username) {
-        this.username = username;
-    }
-
-    updateScore(newScore) {
-        if (this.score < newScore) {
-            this.score = newScore;
-        }
-    }
-
-}
+import Paddle from "./paddle.js";
+import Ball from "./ball.js";
+import BlockContainer from "./blockContainer.js";
+import Player from "./player.js";
 
 export default class Brain {
     width = 1000;
@@ -174,7 +21,7 @@ export default class Brain {
 
     paddle = new Paddle(this);
     ball = new Ball(this);
-    blocks = new Blocks(this);
+    blocks = new BlockContainer(this);
 
 
     // PADDLE ACTIONS
@@ -228,7 +75,7 @@ export default class Brain {
                 this.bounceOffBlocks();
 
                 // Don't show broken blocks
-                this.blocks.updateBlocks();
+                this.blocks.updateBlockContainer();
 
                 // Manage game actions
                 if (this.blocks.count === 0) {
@@ -272,7 +119,7 @@ export default class Brain {
 
         this.score += 100*this.blocks.rows*this.blocks.columns; //bonus points
         this.blocks.rows = Math.min(this.blocks.rows + 1, this.blocks.maxRows);
-        this.blocks.createBlocks();
+        this.blocks.createBlockContainer();
     }
 
     resetGame() {
@@ -308,7 +155,7 @@ export default class Brain {
 
     resetBlocks() {
         this.blocks.rows = 1; // Start with initial number of rows
-        this.blocks.createBlocks(); // Re-create the blocks for the new game
+        this.blocks.createBlockContainer(); // Re-create the blocks for the new game
     }
 
 

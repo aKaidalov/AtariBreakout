@@ -1,5 +1,5 @@
-import Brain from "./brain.js";
-import UI from "./ui.js";
+import Brain from "../brain/brain.js";
+import UI from "../ui/ui.js";
 
 // recursively update UI
 function uiDrawRepeater(ui, brain) {

@@ -114,7 +114,7 @@ export default class Brain {
     //level = blockRows
     nextLevel() {
         // Return ball and paddle to start position and make the ball slightly faster.
-        this.resetBall(Math.abs(this.ball.velocityX) + 1, Math.abs(this.ball.velocityY) + 1);
+        this.resetBall(this.ball.speed + 1);
         this.resetPaddle()
 
         this.score += 100*this.blocks.rows*this.blocks.columns; //bonus points
@@ -127,7 +127,7 @@ export default class Brain {
 
         // Reset game elements
         this.resetPaddle();
-        this.resetBall(3, 2);
+        this.resetBall(5);
         this.resetBlocks();
 
         // Reset game state
@@ -146,11 +146,12 @@ export default class Brain {
         this.paddle.stopMove();
     }
 
-    resetBall(vx, vy) {
+    resetBall(speed) {
         this.ball.left = (this.width / 2) - (this.ball.width / 2);
-        this.ball.top = (this.height / 2) - (this.ball.height / 2);
-        this.ball.velocityX = vx; // Reset to original velocity if changed during gameplay
-        this.ball.velocityY = vy; // Reset to original velocity if changed during gameplay
+        this.ball.top = this.paddle.top - this.ball.height;
+        // this.ball.velocityX = vx;
+        this.ball.velocityY = - speed;
+        this.ball.speed = speed;
     }
 
     resetBlocks() {
@@ -159,7 +160,7 @@ export default class Brain {
     }
 
 
-    // COLLISION TODO: it has a bug when detects corner collision! - Logic problem.
+    // COLLISION
     detectCollision(a, b) {
         return  a.left <= b.left + b.width &&  // a's top left corner doens't reach b's top right corner
             a.left + a.width >= b.left &&  // a's top right corner doesn't reach b's top left corner
@@ -193,7 +194,8 @@ export default class Brain {
     // Paddle collision
     bounceOffPaddle() {
         if (this.detectCollision(this.ball, this.paddle)) {
-            this.ball.changeDirectionY();
+            // this.ball.changeDirectionY();
+            this.ball.bounce(this.paddle);
         }
     }
 
